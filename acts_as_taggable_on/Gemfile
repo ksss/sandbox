@@ -28,6 +28,9 @@ gem 'spring',        group: :development
 
 gem 'acts_as_taggable_on'
 
+group :development, :test do
+  gem 'rspec-rails', '3.0.1'
+end
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
