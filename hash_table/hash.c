@@ -40,7 +40,7 @@ struct item *
 item_new(const char *key, int value)
 {
   struct item *item = (struct item *) mmalloc(sizeof(struct item));
-  item->key = (char *)mmalloc(strlen(key));
+  item->key = (char *)mmalloc(strlen(key)+1);
   memcpy(item->key, key, strlen(key)+1);
   item->value = value;
   item->next = NULL;
@@ -108,6 +108,7 @@ hash_inspect(struct hash *h)
       indent++;
     }
   }
+  printf("capa: %d, len: %d\n", h->capa, h->len);
   printf("===hash_inspect end===\n");
 }
 
@@ -177,6 +178,7 @@ hash_set_internal(struct hash *h, const char *key, int value, int can_rehash)
   if (h->ary[key_index] == NULL) {
     item = item_new(key, value);
     h->ary[key_index] = item;
+    h->len++;
     return;
   }
 
@@ -194,6 +196,7 @@ hash_set_internal(struct hash *h, const char *key, int value, int can_rehash)
 
   item = item_new(key, value);
   top->next = item;
+  h->len++;
 
   if (can_rehash && rehash) {
     hash_rehash(h);
@@ -207,7 +210,7 @@ hash_set(struct hash *h, char *key, int value)
 }
 
 int
-hash_get(struct hash *h, const char *key)
+hash_get(struct hash *h, char *key)
 {
   struct item *item = h->ary[hashing(key) % h->capa];
 
@@ -243,10 +246,10 @@ int main(int argc, char **argv)
     ch[3] = '\0';
     printf("get %s = %d\n", (const char *)ch, hash_get(h, ch));
   }
-  // hash_inspect(h);
-  hash_free(h);
+  hash_inspect(h);
   printf("malloc_count=%d\n", malloc_count);
   printf("item_count=%d\n", item_count);
   printf("hash_count=%d\n", hash_count);
+  hash_free(h);
 }
 
